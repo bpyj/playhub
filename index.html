@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PlayHub</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
+  <meta name="description" content="A parent-friendly hub for simple learning games." />
+  <style>
+    :root{
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --shadow: 0 10px 25px rgba(17, 24, 39, 0.06);
+      --radius: 16px;
+      --focus: 0 0 0 3px rgba(59, 130, 246, 0.25);
+      --chip: #eef2ff;
+      --chipText: #3730a3;
+      --btn: #ffffff;
+      --btnActive: #111827;
+      --btnActiveText: #ffffff;
+      --linkHover: rgba(0,0,0,0.04);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body{
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    a{ color: inherit; text-decoration: none; }
+    a:focus-visible, button:focus-visible, input:focus-visible {
+      outline: none;
+      box-shadow: var(--focus);
+      border-radius: 10px;
+    }
+
+    .container{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 18px 50px;
+    }
+
+    /* Header */
+    .topbar{
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .brand h1{
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: -0.02em;
+    }
+    .brand p{
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .nav{
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .nav a{
+      padding: 8px 10px;
+      border-radius: 10px;
+    }
+    .nav a:hover{ background: var(--linkHover); color: var(--text); }
+
+    /* Filters */
+    .panel{
+      background: rgba(255,255,255,0.65);
+      backdrop-filter: blur(6px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+    .filters{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .filter-left{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .chipbtn{
+      border: 1px solid var(--border);
+      background: var(--btn);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: transform 0.06s ease, background 0.2s ease;
+    }
+    .chipbtn:hover{ transform: translateY(-1px); }
+    .chipbtn.active{
+      background: var(--btnActive);
+      color: var(--btnActiveText);
+      border-color: var(--btnActive);
+    }
+
+    .search{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .search input{
+      width: 100%;
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+    .search small{
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* Grid */
+    .grid{
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 14px;
+    }
+
+    .card{
+      grid-column: span 12;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 170px;
+    }
+
+    @media (min-width: 640px){
+      .card{ grid-column: span 6; }
+    }
+    @media (min-width: 980px){
+      .card{ grid-column: span 4; }
+    }
+
+    .card-body{
+      padding: 16px 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      height: 100%;
+    }
+
+    .card-top{
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .title{
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.015em;
+      line-height: 1.15;
+    }
+
+    .badge{
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #ecfeff;
+      color: #155e75;
+      border: 1px solid #cffafe;
+      white-space: nowrap;
+    }
+
+    .tags{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .tag{
+      background: var(--chip);
+      color: var(--chipText);
+      border: 1px solid rgba(55,48,163,0.10);
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+    }
+
+    .desc{
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.35;
+      flex: 1;
+    }
+
+    .meta{
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .card-actions{
+      padding: 0 16px 16px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .play{
+      border: 1px solid #111827;
+      background: #111827;
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+    }
+    .play:hover{ filter: brightness(1.05); }
+
+    .subtle{
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .empty{
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+      padding: 22px 12px;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.6);
+      display: none;
+    }
+
+    /* Footer */
+    footer{
+      margin-top: 26px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: left;
+      background: rgba(255,255,255,0.65);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    .footer-grid{
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    @media (min-width: 900px){
+      .footer-grid{
+        grid-template-columns: 1.3fr 1fr 0.9fr;
+        align-items: start;
+      }
+    }
+    .footer-block h3{
+      margin: 0 0 6px 0;
+      font-size: 13px;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+    .footer-block p{
+      margin: 0;
+      line-height: 1.45;
+    }
+    .footer-block a{
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .footer-bottom{
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header class="topbar">
+      <div class="brand">
+        <h1>PlayHub</h1>
+        <p>A parent-friendly hub for simple learning web apps.</p>
+      </div>
+      <nav class="nav" aria-label="Top navigation">
+        <a href="#" id="navAll">All Games</a>
+        <a href="#about" id="navAbout">About</a>
+      </nav>
+    </header>
+
+    <section class="panel" aria-label="Filters">
+      <div class="filters">
+        <div class="filter-left" id="filterButtons" aria-label="Category filters">
+          <!-- Buttons inserted by JS -->
+        </div>
+      </div>
+
+      <div class="search">
+        <input id="searchBox" type="search" placeholder="Search by title, description, or tag…" />
+        <small id="resultsCount">0 games</small>
+      </div>
+    </section>
+
+    <main>
+      <div class="grid" id="grid" aria-label="Game list"></div>
+      <div class="empty" id="emptyState">No games match this filter.</div>
+    </main>
+
+    <footer id="about" aria-label="About and privacy">
+      <div class="footer-grid">
+        <div class="footer-block">
+          <h3>About PlayHub</h3>
+          <p>PlayHub is a personal collection of simple, browser-based learning games designed to support early numeracy, reading, and logical thinking.<br/>
+          The games are intentionally lightweight, easy to understand, and suitable for young children, with parents and educators in mind.</p>
+        </div>
+
+        <div class="footer-block">
+          <h3>Privacy Note</h3>
+          <p>PlayHub does not collect personal information, require user accounts, or track users.<br/>
+          All games run directly in the web browser.</p>
+          <div style="height:10px;"></div>
+          <h3>Educational Use</h3>
+          <p>These games are provided free for personal and educational use.</p>
+        </div>
+
+        <div class="footer-block">
+          <h3>Feedback & ideas</h3>
+          <p>
+            <a href="mailto:bpyj@yahoo.com" aria-label="Email PlayHub">bpyj@yahoo.com</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>Built on GitHub Pages.</div>
+        <div>© <span id="year"></span> PlayHub</div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // -----------------------------
+    // 1) EDIT THIS LIST TO ADD GAMES
+    // -----------------------------
+    const GAMES = [
+      {
+        title: "Forest Bingo",
+        url: "https://bpyj.github.io/gruffalobingo/",
+        tags: ["Math", "Turn-Based", "Ages 4–6"],
+        description: "Roll and match symbols to complete rows. Great for turn-taking and counting.",
+        isNew: false
+      },
+      {
+        title: "Numbers Combine",
+        url: "https://bpyj.github.io/numberscombine/",
+        tags: ["Math", "Logic", "Ages 4–6"],
+        description: "Combine numbers to reach a target. Builds number sense and simple strategy.",
+        isNew: true
+      },
+      {
+        title: "Crosswords by Kay",
+        url: "https://bpyj.github.io/crosswordsbykay/",
+        tags: ["Words", "Reading", "Ages 5–7"],
+        description: "Simple crosswords for early readers. Encourages spelling and vocabulary practice.",
+        isNew: false
+      },
+      {
+        title: "Too Full Trains",
+        url: "https://bpyj.github.io/toofulltrains/",
+        tags: ["Logic", "Trains & Vehicles", "Ages 4–6"],
+        description: "A capacity-themed mini game: plan your choices so the train doesn’t get too full.",
+        isNew: false
+      },
+      {
+        title: "Wordway Racers",
+        url: "https://bpyj.github.io/wordway_racers/",
+        tags: ["Words", "Racing", "Ages 5–7"],
+        description: "Answer correctly to race forward. A fun way to reinforce quick reading and word recall.",
+        isNew: true
+      }
+    ];
+
+    // -----------------------------
+    // 2) FILTER CATEGORIES (auto-built from tags)
+    // -----------------------------
+    const PINNED_CATEGORIES = ["All", "Math", "Words", "Logic", "Trains & Vehicles", "Racing", "Turn-Based", "New"];
+
+    const grid = document.getElementById("grid");
+    const emptyState = document.getElementById("emptyState");
+    const filterButtons = document.getElementById("filterButtons");
+    const searchBox = document.getElementById("searchBox");
+    const resultsCount = document.getElementById("resultsCount");
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    let activeCategory = "All";
+
+    function uniqueTagsFromGames(games){
+      const set = new Set();
+      games.forEach(g => (g.tags || []).forEach(t => set.add(t)));
+      return Array.from(set).sort((a,b) => a.localeCompare(b));
+    }
+
+    function buildCategories(){
+      const allTags = uniqueTagsFromGames(GAMES);
+
+      // Start with pinned, then add any extra tags not already pinned.
+      const categories = [...PINNED_CATEGORIES];
+      allTags.forEach(t => {
+        if (!categories.includes(t)) categories.push(t);
+      });
+
+      return categories;
+    }
+
+    function renderFilterButtons(){
+      const cats = buildCategories();
+      filterButtons.innerHTML = "";
+
+      cats.forEach(cat => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "chipbtn" + (cat === activeCategory ? " active" : "");
+        btn.textContent = cat;
+
+        btn.addEventListener("click", () => {
+          activeCategory = cat;
+          // reset button states
+          [...filterButtons.querySelectorAll("button")].forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          render();
+        });
+
+        filterButtons.appendChild(btn);
+      });
+    }
+
+    function matchesCategory(game){
+      if (activeCategory === "All") return true;
+      if (activeCategory === "New") return !!game.isNew;
+      return (game.tags || []).includes(activeCategory);
+    }
+
+    function matchesSearch(game, q){
+      if (!q) return true;
+      const hay = [
+        game.title,
+        game.description,
+        ...((game.tags || []))
+      ].join(" ").toLowerCase();
+      return hay.includes(q.toLowerCase());
+    }
+
+    function createCard(game){
+      const card = document.createElement("article");
+      card.className = "card";
+
+      const tagsHtml = (game.tags || [])
+        .map(t => `<span class="tag">${escapeHtml(t)}</span>`)
+        .join("");
+
+      const badge = game.isNew ? `<span class="badge">New</span>` : "";
+
+      card.innerHTML = `
+        <div class="card-body">
+          <div class="card-top">
+            <h2 class="title">${escapeHtml(game.title)}</h2>
+            ${badge}
+          </div>
+
+          <div class="tags" aria-label="Tags">
+            ${tagsHtml}
+          </div>
+
+          <p class="desc">${escapeHtml(game.description || "")}</p>
+
+          <div class="meta">
+            <span class="subtle">${escapeHtml(new URL(game.url).host)}</span>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <a class="play" href="${game.url}" target="_blank" rel="noopener noreferrer">Play</a>
+        </div>
+      `;
+
+      return card;
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function render(){
+      const q = searchBox.value.trim();
+      const filtered = GAMES.filter(g => matchesCategory(g) && matchesSearch(g, q));
+
+      grid.innerHTML = "";
+      filtered.forEach(g => grid.appendChild(createCard(g)));
+
+      emptyState.style.display = filtered.length ? "none" : "block";
+      resultsCount.textContent = `${filtered.length} game${filtered.length === 1 ? "" : "s"}`;
+    }
+
+    // Search input handler
+    searchBox.addEventListener("input", () => render());
+
+    // Nav shortcuts
+    document.getElementById("navAll").addEventListener("click", (e) => {
+      e.preventDefault();
+      activeCategory = "All";
+      renderFilterButtons();
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    document.getElementById("navAbout").addEventListener("click", (e) => {
+      e.preventDefault();
+      document.getElementById("about").scrollIntoView({ behavior: "smooth" });
+    });
+
+    // Init
+    renderFilterButtons();
+    render();
+  </script>
+</body>
+</html>
