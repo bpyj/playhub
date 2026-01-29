@@ -43,7 +43,14 @@ const GAMES = [
     tags: ["Directions", "Racing", "Ages 5–7"],
     description: "Move North, South, East, West to find animals!",
     isNew: true
-  }
+  },
+  {
+  title: "Hanzi Hunt 汉字寻宝",
+  url: "https://bpyj.github.io/hanzi_hunt/",   // <-- change to your actual folder URL
+  tags: ["Words", "Chinese", "Ages 4–6"],
+  description: "Find the correct Chinese characters to form the word. A fun Hanzi treasure hunt for early learners.",
+  isNew: true
+}
 ];
 
 // -----------------------------
